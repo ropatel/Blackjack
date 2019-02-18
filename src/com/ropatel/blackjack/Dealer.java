@@ -17,18 +17,22 @@ public class Dealer {
     void dealSelf(boolean faceup) {
         Card card = deck.draw();
         card.setFaceup(faceup);
-        System.out.println(card);
         hand.addCardToHand(card);
     }
 
-    public void showHand() {
-        hand.showHand();
-    }
-
-    public Card deal(boolean faceup) {
+    public Card deal(boolean faceup, Hand hand) {
         Card card = deck.draw();
         card.setFaceup(faceup);
+        hand.addCardToHand(card);
         return card;
+    }
+
+    public void showHand() {
+        hand.showHand(true);
+    }
+
+    public void showHiddenHand() {
+        hand.showHand(false);
     }
 
     void showCards() {

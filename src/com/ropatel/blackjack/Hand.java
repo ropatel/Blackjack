@@ -22,10 +22,13 @@ public class Hand {
         return sum;
     }
 
-    public void showHand() {
+    public void showHand(boolean faceup) {
         for (Card card : hand) {
+            if (faceup) {
+                card.setFaceup(true);
+            }
             System.out.print(card + " ");
-            System.out.println();
         }
+        System.out.println();
     }
 }
