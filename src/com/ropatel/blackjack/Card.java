@@ -15,6 +15,10 @@ public class Card {
         this.faceup = faceup;
     }
 
+    public boolean isFaceup() {
+        return faceup;
+    }
+
     public Suit getSuit() {
         return this.suit;
     }

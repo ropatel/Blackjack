@@ -14,6 +14,17 @@ public class Hand {
         sum = 0;
     }
 
+    public boolean checkUpAce() {
+        if (size == 2) {
+            for (Card card : hand) {
+                if (card.isFaceup()) {
+                    if (card.getRank() == Rank.ACE) return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public void addCardToHand(Card card) {
         this.hand.add(card);
         size++;

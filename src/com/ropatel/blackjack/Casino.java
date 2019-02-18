@@ -18,7 +18,6 @@ public class Casino {
     }
 
     public static void main(String[] args) {
-
         Casino casino = new Casino();
         casino.addPlayer();
         casino.openingRound();
@@ -33,66 +32,23 @@ public class Casino {
         showPlayerFunds();
     }
 
-    private void showPlayerFunds() {
-        player.totalFunds();
-    }
-
-    private void playerHit() {
-        System.out.println("====== Player =======");
-        dealer.deal(true, player.getHand());
-        player.showHand();
-    }
-
-    private void dealerHit(final boolean faceup) {
-        System.out.println("====== Dealer =======");
-        dealer.dealSelf(faceup);
-        dealer.showHiddenHand();
-    }
-
     public void openingRound() {
 
-        boolean dealerAceUp = false;
-
         playerHit();
-        dealerHit(false);
+        dealerHit(false, false);
+        playerHit();
+        dealerHit(true, false);
 
         if (checkDealerAce()) {
-            dealerAceUp = true;
             checkInsurance();
-        }
-
-        playerHit();
-        dealerHit(true);
-
-        if (dealerAceUp) {
-            if (dealer.getHand().getSum() == 21) {
+            if (checkBlackjack(dealer.getHand())) {
                 showDealerWin(EndStates.NATURAL_BLACKJACK);
             }
         }
-        if (checkNaturalBlackjack(player.getHand())) {
+
+        if (checkBlackjack(player.getHand())) {
             showPlayerWin(EndStates.NATURAL_BLACKJACK);
         }
-    }
-
-    private boolean checkDealerAce() {
-        return dealer.getHand().contains(Rank.ACE);
-    }
-
-    private void checkInsurance() {
-        Scanner reader = new Scanner(System.in);
-        System.out.println("Dealer Ace - Insurance? (Y/N)");
-        String choice = reader.next();
-        if (choice.equals("Y")) {
-            System.out.println("Insurance purchased");
-        } else {
-            System.out.println("No Insurance");
-        }
-    }
-
-    private String promptForCard() {
-        System.out.println();
-        System.out.println("(H)it (S)tay");
-        return reader.next();
     }
 
     public void playerLoop() {
@@ -115,10 +71,53 @@ public class Casino {
 
     public void dealerLoop() {
         while (dealer.getSum() < 18 && !endState) {
-            dealerHit(true);
+            dealerHit(true, true);
         }
         checkWinConditions();
     }
+
+    private void showPlayerFunds() {
+        player.totalFunds();
+    }
+
+    private void playerHit() {
+        System.out.println("====== Player =======");
+        dealer.deal(true, player.getHand());
+        player.showHand();
+    }
+
+    private void dealerHit(final boolean faceup, final boolean openHand) {
+        System.out.println("====== Dealer =======");
+        dealer.dealSelf(faceup);
+        if (openHand) {
+            dealer.showHand();
+        } else {
+            dealer.showHiddenHand();
+        }
+    }
+
+
+    private boolean checkDealerAce() {
+        return dealer.getHand().checkUpAce();
+    }
+
+    private void checkInsurance() {
+        Scanner reader = new Scanner(System.in);
+        System.out.println("Dealer Ace - Insurance? (Y/N)");
+        String choice = reader.next();
+        if (choice.equals("Y")) {
+            System.out.println("Insurance purchased");
+        } else {
+            System.out.println("No Insurance");
+        }
+    }
+
+    private String promptForCard() {
+        System.out.println();
+        System.out.println("(H)it (S)tay");
+        return reader.next();
+    }
+
 
     private void checkWinConditions() {
         int dealerHand = dealer.getSum();
@@ -162,7 +161,7 @@ public class Casino {
                 System.out.println("Player Wins - Dealer busts!");
                 break;
             case PLAYER_HIGHER:
-                System.out.println("Player Wins - Player Higher");
+                System.out.println("Player Wins");
                 break;
         }
         endState = true;
@@ -181,18 +180,11 @@ public class Casino {
                 System.out.println("Dealer Wins - Player busts!");
                 break;
             case DEALER_HIGHER:
-                System.out.println("Dealer Wins - Dealer Higher");
+                System.out.println("Dealer Wins");
                 break;
         }
         endState = true;
         showFinalState();
-    }
-
-    private boolean checkNaturalBlackjack(final Hand hand) {
-        if (hand.size() == 2) {
-            return (hand.contains(Rank.ACE) && (hand.contains(Rank.TEN) || hand.contains(Rank.JACK) || hand.contains(Rank.QUEEN) || hand.contains(Rank.KING)));
-        }
-        return false;
     }
 
     private boolean checkBlackjack(final Hand hand) {
