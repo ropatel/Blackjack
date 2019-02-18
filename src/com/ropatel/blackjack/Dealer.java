@@ -7,6 +7,7 @@ public class Dealer {
 
     Dealer(Deck deck) {
         this.deck = deck;
+        deck.shuffleCards();
         hand = new Hand();
     }
 
@@ -27,12 +28,16 @@ public class Dealer {
         return card;
     }
 
+    public Hand getHand() {
+        return hand;
+    }
+
     public void showHand() {
-        hand.showHand(true);
+        hand.showHand(true, false);
     }
 
     public void showHiddenHand() {
-        hand.showHand(false);
+        hand.showHand(false, false);
     }
 
     void showCards() {
@@ -40,7 +45,7 @@ public class Dealer {
     }
 
     int getSum() {
-        return hand.getHandSum();
+        return hand.getSum();
     }
 
 }

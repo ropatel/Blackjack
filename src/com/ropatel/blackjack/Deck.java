@@ -1,6 +1,8 @@
 package com.ropatel.blackjack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Stack;
 
 public class Deck {
     private int size;
@@ -37,19 +39,6 @@ public class Deck {
         int second;
         int NUMBER_OF_SWAPS = 3000;
         Random rand = new Random();
-
-        /*
-        HashSet<Integer> audit = new HashSet<>();
-
-        while (audit.size()!=51) {
-            first = rand.nextInt(52);
-            audit.add(first);
-            second = rand.nextInt(52);
-            audit.add(second);
-            swapCards(first,second);
-            //System.out.println(audit.size());
-        }
-        */
 
         for (int i = 0; i < NUMBER_OF_SWAPS; i++) {
             first = rand.nextInt(52);
