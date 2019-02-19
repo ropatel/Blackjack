@@ -4,6 +4,7 @@ public class Card {
     private Suit suit;
     private Rank rank;
     private boolean faceup;
+    private String FACEDOWN_SYMBOL = "#";
 
     public Card(Suit suit, Rank rank) {
         this.suit = suit;
@@ -27,7 +28,7 @@ public class Card {
         if (faceup) {
             return this.rank.getSymbol() + this.suit.getSymbol();
         } else {
-            return "X";
+            return FACEDOWN_SYMBOL;
         }
     }
 

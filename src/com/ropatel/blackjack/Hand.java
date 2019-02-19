@@ -59,12 +59,22 @@ public class Hand {
             if (faceup) {
                 card.setFaceup(true);
             }
-            System.out.print(card + " ");
+            flipCard(card);
         }
         if (showSum) {
             System.out.println("     Sum = " + sum);
         } else {
             System.out.println();
+        }
+    }
+
+    private void flipCard(Card card) {
+        int DELAY = 100;
+        System.out.print(card + " ");
+        try {
+            Thread.sleep(DELAY);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
