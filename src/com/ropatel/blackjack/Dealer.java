@@ -28,12 +28,20 @@ public class Dealer {
         return card;
     }
 
+    public void clearHand() {
+        hand = new Hand();
+    }
+
     public Hand getHand() {
         return hand;
     }
 
     public void showHand() {
         hand.showHand(true, false);
+    }
+
+    public void showHandWithSum() {
+        hand.showHand(true, true);
     }
 
     public void showHiddenHand() {

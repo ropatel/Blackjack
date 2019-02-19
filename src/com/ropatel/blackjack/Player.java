@@ -24,6 +24,10 @@ public class Player {
         return wager;
     }
 
+    public void clearHand() {
+        hand = new Hand();
+    }
+
     public void addFunds(double funds) {
         bank += funds;
     }
@@ -34,6 +38,10 @@ public class Player {
     }
 
     public void showHand() {
+        hand.showHand(true, false);
+    }
+
+    public void showHandWithSum() {
         hand.showHand(true, true);
     }
 
