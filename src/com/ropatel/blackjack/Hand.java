@@ -1,12 +1,13 @@
 package com.ropatel.blackjack;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Hand {
+public abstract class Hand {
 
-    private ArrayList<Card> hand;
-    private int size;
-    private int sum;
+    protected List<Card> hand;
+    protected int size;
+    protected int sum;
 
     public Hand() {
         hand = new ArrayList<>();
@@ -14,29 +15,12 @@ public class Hand {
         sum = 0;
     }
 
-    public boolean checkUpAce() {
-        if (size == 2) {
-            for (Card card : hand) {
-                if (card.isFaceup()) {
-                    if (card.getRank() == Rank.ACE) return true;
-                }
-            }
-        }
-        return false;
-    }
+
 
     public void addCardToHand(Card card) {
         this.hand.add(card);
         size++;
-        if (card.getRank() == Rank.ACE) {
-            if (sum < 11) {
-                sum += 11;
-            } else {
-                sum++;
-            }
-        } else {
-            sum += card.getValue();
-        }
+
     }
 
     public boolean contains(Rank rank) {
@@ -50,9 +34,7 @@ public class Hand {
         return this.size;
     }
 
-    public int getSum() {
-        return sum;
-    }
+    public abstract int getSum();
 
     public void showHand(boolean faceup, boolean showSum) {
         for (Card card : hand) {
@@ -77,4 +59,5 @@ public class Hand {
             e.printStackTrace();
         }
     }
+
 }
