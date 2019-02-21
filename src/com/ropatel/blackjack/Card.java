@@ -1,12 +1,12 @@
 package com.ropatel.blackjack;
 
 public class Card {
-    private Suit suit;
-    private Rank rank;
+    private final Suit suit; // finals
+    private final Rank rank;
     private boolean faceup;
-    private String FACEDOWN_SYMBOL = "#";
+    private static final String FACEDOWN_SYMBOL = "#";
 
-    public Card(Suit suit, Rank rank) {
+    public Card(final Suit suit, final Rank rank) {
         this.suit = suit;
         this.rank = rank;
         this.faceup = true;

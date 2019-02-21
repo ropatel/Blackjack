@@ -2,14 +2,17 @@ package com.ropatel.blackjack;
 
 import java.util.Scanner;
 
-public class Casino {
+public class Blackjack {
 
-    private final Dealer dealer;
+    private final VirtualBlackjackPlayer virtualDealer;
     private Player player;
-    private final double MINIMUM_BET = 5.0;
+    private VirtualBlackjackPlayer virtualPlayer;
+    private static final double MINIMUM_BET = 5.0;
     private final Scanner reader;
     private boolean endState = false;
     private boolean finished = false;
+    private Deck deck;
+    private static final int DECK_SIZE = 52;
 
     private enum EndStates {
         NATURAL_BLACKJACK,
@@ -21,16 +24,16 @@ public class Casino {
         DEALER_CLOSER
     }
 
-    public Casino() {
-        int DECK_SIZE = 52;
-        Deck deck = new Deck(DECK_SIZE);
-        dealer = new Dealer(deck);
+    public Blackjack() {
+        deck = new Deck(DECK_SIZE);
+        deck.shuffleCards();
+        virtualDealer = new VirtualBlackjackPlayer();
         reader = new Scanner(System.in);
     }
 
     public static void main(String[] args) {
 
-        Casino casino = new Casino();
+        Blackjack casino = new Blackjack();
         casino.addPlayer();
 
         while (!casino.done()) {
@@ -45,8 +48,8 @@ public class Casino {
     }
 
     public void newGame() {
-        player.clearHand();
-        dealer.clearHand();
+        virtualPlayer.clearHand();
+        virtualDealer.clearHand();
         endState = false;
     }
 
@@ -55,27 +58,28 @@ public class Casino {
         String name = reader.next();
         player = new Player(name);
         showPlayerFunds();
+        virtualPlayer = new VirtualBlackjackPlayer();
     }
 
     public void openingRound() {
 
         playerHit();
-        dealerHit(false, false);
+        dealerHit();
         paintState(false);
         pauseDealer();
         playerHit();
-        dealerHit(true, false);
+        dealerHit();
         paintState(false);
         pauseDealer();
 
-        if (checkDealerAce()) {
+        /*if (checkDealerAce()) {
             checkInsurance();
-            if (checkBlackjack(dealer.getHand())) {
+            if (checkBlackjack(virtualDealer)) {
                 showDealerWin(EndStates.NATURAL_BLACKJACK);
             }
-        }
+        }*/
 
-        if (checkBlackjack(player.getHand())) {
+        if (virtualPlayer.getHandState() == BlackjackState.BLACKJACK) {
             showPlayerWin(EndStates.NATURAL_BLACKJACK);
         }
     }
@@ -88,11 +92,11 @@ public class Casino {
                 playerHit();
                 paintState(false);
                 pauseDealer();
-                if (checkBlackjack(player.getHand())) {
+                if (checkBlackjack(virtualPlayer)) {
                     showPlayerWin(EndStates.BLACKJACK);
                     break;
                 }
-                if (checkBust(player.getHand())) {
+                if (checkBust(virtualPlayer)) {
                     showDealerWin(EndStates.PLAYER_BUST);
                     break;
                 }
@@ -103,8 +107,8 @@ public class Casino {
 
     public void dealerLoop() {
         if (!endState) {
-            while (dealer.getSum() < 18 && !endState) {
-                dealerHit(true, true);
+            while (virtualDealer.getHandState() == BlackjackState.UNDER_SEVENTEEN && !endState) {
+                dealerHit();
                 paintState(true);
                 pauseDealer();
                 System.out.println();
@@ -134,21 +138,37 @@ public class Casino {
         }
     }
 
+    public Card draw() {
+        Card card = deck.draw();
+        if (card == null) {
+            deck = new Deck(DECK_SIZE);
+            deck.shuffleCards();
+            card = deck.draw();
+        }
+        return card;
+    }
+
+    public Card deal(VirtualBlackjackPlayer player) {
+        Card card = draw();
+        player.putCard(card);
+        return card;
+    }
+
     private void showPlayerFunds() {
-        player.totalFunds();
+        player.showBank();
     }
 
     private void playerHit() {
-        dealer.deal(true, player.getHand());
+        deal(virtualPlayer);
     }
 
-    private void dealerHit(final boolean faceup, final boolean openHand) {
-        dealer.dealSelf(faceup);
+    private void dealerHit() {
+        deal(virtualDealer);
     }
 
-    private boolean checkDealerAce() {
-        return dealer.getHand().checkUpAce();
-    }
+    /*private boolean checkDealerAce() {
+        return virtualDealer.getHand().checkUpAce();
+    }*/
 
     private void checkInsurance() {
         Scanner reader = new Scanner(System.in);
@@ -168,10 +188,10 @@ public class Casino {
     }
 
     private void checkWinConditions() {
-        int dealerHand = dealer.getSum();
-        int playerHand = player.getSum();
+        int dealerHand = virtualDealer.getHandTotal();
+        int playerHand = virtualPlayer.getHandTotal();
 
-        if (dealerHand >= 18) {
+        if (dealerHand >= 17) {
             if (dealerHand == playerHand) {
                 showPlayerWin(EndStates.PUSH);
             } else if (dealerHand < playerHand) {
@@ -184,47 +204,47 @@ public class Casino {
         }
     }
 
-    private void paintState(boolean openHand) {
+    private void paintState(final boolean openHand) {
         //System.out.println("----------------------------------------------------------");
         System.out.println(".......... Dealer ..........");
         if (openHand) {
-            dealer.showHandWithSum();
+            virtualDealer.showHandWithSum();
         } else {
-            dealer.showHiddenHand();
+            virtualDealer.showHiddenHand();
         }
         //System.out.println("............................");
         System.out.println(".......... " + player.getName() + " ..........");
-        player.showHandWithSum();
+        virtualPlayer.showHandWithSum();
         //System.out.println("............................");
         //System.out.println("----------------------------------------------------------");
     }
 
-    private void showFinalState(String status) {
+    private void showFinalState(final String status) {
         pauseDealer();
         System.out.println(".......... Dealer ..........");
-        System.out.println("Hand total = " + dealer.getSum());
-        dealer.showHand();
-        System.out.println(".......... Player ..........");
-        System.out.println("Hand total = " + player.getSum());
-        player.showHand();
+        System.out.println("Hand total = " + virtualDealer.getHandTotal());
+        virtualDealer.showHand();
+        System.out.println(".......... virtualPlayer ..........");
+        System.out.println("Hand total = " + virtualPlayer.getHandTotal());
+        virtualPlayer.showHand();
         System.out.println("************ " + status.toUpperCase() + " *************");
     }
 
-    //TODO - Refactor to remove duplicate code. Player and Dealer should implement an interface.
+    //TODO - Refactor to remove duplicate code. virtualPlayer and Dealer should implement an interface.
     private void showPlayerWin(final EndStates state) {
         String status = "";
         switch (state) {
             case NATURAL_BLACKJACK:
-                status = "Player Wins - Natural Blackjack!";
+                status = "virtualPlayer Wins - Natural Blackjack!";
                 break;
             case BLACKJACK:
-                status = "Player Wins - Blackjack!";
+                status = "virtualPlayer Wins - Blackjack!";
                 break;
             case DEALER_BUST:
-                status = "Player Wins - Dealer busts!";
+                status = "virtualPlayer Wins - Dealer busts!";
                 break;
             case PLAYER_CLOSER:
-                status = "Player Wins";
+                status = "virtualPlayer Wins";
                 break;
             case PUSH:
                 status = "Push";
@@ -244,7 +264,7 @@ public class Casino {
                 status = "Dealer Wins - Blackjack!";
                 break;
             case PLAYER_BUST:
-                status = "Dealer Wins - Player busts!";
+                status = "Dealer Wins - " + player.getName() + " busts!";
                 break;
             case DEALER_CLOSER:
                 status = "Dealer Wins";
@@ -254,11 +274,11 @@ public class Casino {
         showFinalState(status);
     }
 
-    private boolean checkBlackjack(final Hand hand) {
-        return (hand.getSum() == 21);
+    private boolean checkBlackjack(VirtualBlackjackPlayer player) {
+        return (player.getHandState() == BlackjackState.BLACKJACK);
     }
 
-    private boolean checkBust(final Hand hand) {
-        return (hand.getSum() > 21);
+    private boolean checkBust(final VirtualBlackjackPlayer player) {
+        return (player.getHandState() == BlackjackState.BUST);
     }
 }

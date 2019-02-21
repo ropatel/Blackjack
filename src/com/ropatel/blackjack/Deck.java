@@ -6,10 +6,10 @@ import java.util.Stack;
 
 public class Deck {
     private int size;
-    private ArrayList<Card> cardstore;
+    private ArrayList<Card> cardstore; // Types should be the interface not the implementation
     private Stack<Card> deck;
 
-    public Deck(int size) {
+    public Deck(int size) { // Final
         this.size = size;
         cardstore = new ArrayList<>();
         buildDeck();
@@ -27,7 +27,7 @@ public class Deck {
         }
     }
 
-    public void showCards() {
+    public void showCards() { // toString()
         for (Card card : deck) {
             System.out.print(card + " ");
         }
@@ -37,7 +37,7 @@ public class Deck {
     public void shuffleCards() {
         int first;
         int second;
-        int NUMBER_OF_SWAPS = 3000;
+        int NUMBER_OF_SWAPS = 3000; // Static final
         Random rand = new Random();
 
         for (int i = 0; i < NUMBER_OF_SWAPS; i++) {
